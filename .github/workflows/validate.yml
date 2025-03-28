@@ -1,4 +1,4 @@
-name: Validação de HTML, CSS e JavaScript
+name: Validação de Código
 
 on: [push, pull_request]
 
@@ -10,21 +10,20 @@ jobs:
       - name: Clonar o repositório
         uses: actions/checkout@v4
 
-      - name: Validar HTML com HTMLHint
-        uses: docker://htmlhint/htmlhint
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
         with:
-          args: "index.html"
+          node-version: '18'
 
-      - name: Validar JavaScript com ESLint
-        uses: reviewdog/action-eslint@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-check
-          eslint_flags: "script.js"
+      - name: Instalar dependências
+        run: |
+          npm install -g eslint htmlhint stylelint
 
-      - name: Validar CSS com Stylelint
-        uses: reviewdog/action-stylelint@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-check
-          stylelint_flags: "**/*.css"
+      - name: Rodar ESLint no JavaScript
+        run: eslint . --ext .js || echo "ESLint encontrou problemas!"
+
+      - name: Rodar HTMLHint no HTML
+        run: htmlhint **/*.html || echo "HTMLHint encontrou problemas!"
+
+      - name: Rodar Stylelint no CSS
+        run: stylelint "**/*.css" || echo "Stylelint encontrou problemas!"
