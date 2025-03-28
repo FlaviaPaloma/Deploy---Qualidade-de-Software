@@ -1,0 +1,30 @@
+name: Validação de HTML, CSS e JavaScript
+
+on: [push, pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar o repositório
+        uses: actions/checkout@v4
+
+      - name: Validar HTML com HTMLHint
+        uses: docker://htmlhint/htmlhint
+        with:
+          args: "index.html"
+
+      - name: Validar JavaScript com ESLint
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-check
+          eslint_flags: "script.js"
+
+      - name: Validar CSS com Stylelint
+        uses: reviewdog/action-stylelint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-check
+          stylelint_flags: "**/*.css"
